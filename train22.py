@@ -127,7 +127,7 @@ if __name__ == '__main__':
     parser.add_argument('-warm', type=int, default=1, help='warm up training phase')
     
     ##learning rate
-    parser.add_argument('-lr', type=float, default=0.1, help='initial learning rate')
+    parser.add_argument('-lr', type=float, default=1, help='initial learning rate')
     parser.add_argument('-resume', action='store_true', default=False, help='resume training')
     args = parser.parse_args()
 
@@ -231,4 +231,4 @@ if __name__ == '__main__':
 
     writer.close()
 
-    os.system('CUDA_VISIBLE_DEVICES=1 python3 train11.py -net vgg16 -gpu > output/train11.txt)
+    os.system('CUDA_VISIBLE_DEVICES=1 python3 train32.py -net vgg16 -gpu > output/train32.txt)

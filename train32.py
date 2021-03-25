@@ -231,4 +231,4 @@ if __name__ == '__main__':
 
     writer.close()
 
-    os.system('CUDA_VISIBLE_DEVICES=1 python3 train31.py -net vgg16 -gpu > output/train31.txt)
+    os.system('CUDA_VISIBLE_DEVICES=0 python3 train31.py -net vgg16 -gpu > ./output/train31.txt')

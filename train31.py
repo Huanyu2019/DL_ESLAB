@@ -230,3 +230,4 @@ if __name__ == '__main__':
             torch.save(net.state_dict(), weights_path)
 
     writer.close()
+    os.system('CUDA_VISIBLE_DEVICES=0 python3 train31.py -net vgg16 -gpu > ./output/train30.txt')

@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
     ## vgg16모델 만들고 저번에 저장한 파일에서 state_dict 불러와서 저장
     vgg = vgg16_bn()
-    vgg.load_state_dict(torch.load('pytorch-cifar100/checkpoint/vgg16/Saturday_13_March_2021_20h_29m_30s/vgg16-195-best.pth'))
+    vgg.load_state_dict(torch.load('checkpoint/vgg16/Saturday_13_March_2021_20h_29m_30s/vgg16-195-best.pth'))
     vgg.eval()
 
 

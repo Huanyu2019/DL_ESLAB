@@ -29,7 +29,7 @@ from utils import get_network, get_training_dataloader, get_test_dataloader, War
 def train(epoch):
 
     start = time.time()
-    net.train()
+    net.train() ## 그냥 제공해주는거같음
     for batch_index, (images, labels) in enumerate(cifar100_training_loader):
 
         if args.gpu:
@@ -116,9 +116,14 @@ def eval_training(epoch=0, tb=True):
 
     return correct.float() / len(cifar100_test_loader.dataset)
 
+
+
+
+##main 함수
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
+    
     parser.add_argument('-net', type=str, required=True, help='net type')
     parser.add_argument('-gpu', action='store_true', default=False, help='use gpu or not')
     
@@ -131,17 +136,21 @@ if __name__ == '__main__':
     parser.add_argument('-resume', action='store_true', default=False, help='resume training')
     args = parser.parse_args()
 
+
+    ## 명령 바탕으로 적절한 모델을 찾아서 net에 넣는다 (util에 있는 함수 )
     net = get_network(args)
 
     #data preprocessing:
+    ## train data preprocessing
     cifar100_training_loader = get_training_dataloader(
-        settings.CIFAR100_TRAIN_MEAN,
-        settings.CIFAR100_TRAIN_STD,
-        num_workers=4,
-        batch_size=args.b,
-        shuffle=True
+        settings.CIFAR100_TRAIN_MEAN, ## 데이터 평균
+        settings.CIFAR100_TRAIN_STD,  ## 데이터 표준 편자
+        num_workers=4, ## ??????
+        batch_size=args.b,## 배치 사이즈
+        shuffle=True ## whether to shuffle ????
     )
 
+    ## test data preprocessing
     cifar100_test_loader = get_test_dataloader(
         settings.CIFAR100_TRAIN_MEAN,
         settings.CIFAR100_TRAIN_STD,
@@ -150,12 +159,15 @@ if __name__ == '__main__':
         shuffle=True
     )
 
+    ## loss function, optimizer 정의하기
     loss_function = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
+    optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4) ## mokmentum 사용
     train_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=settings.MILESTONES, gamma=0.2) #learning rate decay
-    iter_per_epoch = len(cifar100_training_loader)
+    iter_per_epoch = len(cifar100_training_loader) ## 배치 사이즈여야 하는거 아닌가????????????
     warmup_scheduler = WarmUpLR(optimizer, iter_per_epoch * args.warm)
 
+
+    ## 중간에 멈췄다가 다시하는거면..
     if args.resume:
         recent_folder = most_recent_folder(os.path.join(settings.CHECKPOINT_PATH, args.net), fmt=settings.DATE_FORMAT)
         if not recent_folder:
@@ -179,12 +191,16 @@ if __name__ == '__main__':
         input_tensor = input_tensor.cuda()
     writer.add_graph(net, input_tensor)
 
-    #create checkpoint folder to save model
+    #create checkpoint folder to save model (이거 뭐하는거지????????)
     if not os.path.exists(checkpoint_path):
         os.makedirs(checkpoint_path)
     checkpoint_path = os.path.join(checkpoint_path, '{net}-{epoch}-{type}.pth')
 
+
+
     best_acc = 0.0
+
+    ## 이것도 traing하다가 resume할때 
     if args.resume:
         best_weights = best_acc_weights(os.path.join(settings.CHECKPOINT_PATH, args.net, recent_folder))
         if best_weights:
@@ -205,6 +221,7 @@ if __name__ == '__main__':
         resume_epoch = last_epoch(os.path.join(settings.CHECKPOINT_PATH, args.net, recent_folder))
 
 
+
     for epoch in range(1, settings.EPOCH + 1):
         if epoch > args.warm:
             train_scheduler.step(epoch)
@@ -218,6 +235,7 @@ if __name__ == '__main__':
 
         #start to save best performance model after learning rate decay to 0.01
         if epoch > settings.MILESTONES[1] and best_acc < acc:
+            ## 저장하기
             weights_path = checkpoint_path.format(net=args.net, epoch=epoch, type='best')
             print('saving weights file to {}'.format(weights_path))
             torch.save(net.state_dict(), weights_path)
@@ -229,6 +247,5 @@ if __name__ == '__main__':
             print('saving weights file to {}'.format(weights_path))
             torch.save(net.state_dict(), weights_path)
 
-    writer.close()
 
-    os.system('CUDA_VISIBLE_DEVICES=1 python3 train11.py -net vgg16 -gpu > ./output/train11.txt')
+    writer.close()

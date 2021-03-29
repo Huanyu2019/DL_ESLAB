@@ -15,7 +15,7 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
-
+## 적절한 모델을 찾아서 net return
 def get_network(args):
     """ return given network
     """
@@ -167,7 +167,7 @@ def get_training_dataloader(mean, std, batch_size=16, num_workers=2, shuffle=Tru
     """ return training dataloader
     Args:
         mean: mean of cifar100 training dataset
-        std: std of cifar100 training dataset
+        std: std of cifar100 training dataset 
         path: path to cifar100 training python dataset
         batch_size: dataloader batchsize
         num_workers: dataloader num_works
